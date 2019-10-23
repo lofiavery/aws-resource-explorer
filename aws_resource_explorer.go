@@ -37,6 +37,8 @@ func DescribeInstancesAWS() bool {
 		fmt.Printf("Total of %v instances \n", counter)
 		mapping := MapInstanceStates(reservations)
 		fmt.Println(mapping)
+		flatInstances := FlatReservations(reservations)
+		fmt.Println("Len of flat instances: ", len(flatInstances))
 
 	}
 	return true
@@ -51,4 +53,14 @@ func MapInstanceStates(reservations []*ec2.Reservation) map[string]int {
 		}
 	}
 	return m
+}
+
+func FlatReservations(reservations []*ec2.Reservation) []*ec2.Instance {
+	instances := []*ec2.Instance{}
+	for _, r := range reservations {
+		for _, i := range r.Instances {
+			instances = append(instances, i)
+		}
+	}
+	return instances
 }
