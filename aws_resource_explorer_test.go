@@ -8,3 +8,10 @@ func TestHello(t *testing.T) {
 		t.Errorf("Hello() = %q, want %q", got, want)
 	}
 }
+
+func TestDescribeInstancesAWS(t *testing.T) {
+	want := true
+	if success := DescribeInstancesAWS(); success != want {
+		t.Errorf("DescribeInstancesAWS() = %t, want %t", success, want)
+	}
+}
