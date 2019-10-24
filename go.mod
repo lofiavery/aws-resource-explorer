@@ -1,4 +1,4 @@
-module github.com/Isan-Rivkin/aws-resource-explorer
+module aws_resource_explorer
 
 go 1.12
 

@@ -1,4 +1,4 @@
-package aws_resource_explorer
+package aws_services
 
 import (
 	"fmt"
@@ -6,11 +6,14 @@ import (
 	ec2 "github.com/aws/aws-sdk-go/service/ec2"
 )
 
-func Hello() string {
+func Cool() {
+	fmt.Println("Cool is running! ")
+}
+func Hello2() string {
 	return "Hello, world."
 }
 
-func DescribeInstancesAWS() bool {
+func DescribeInstancesAWS2() bool {
 	// Load session from shared config
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -35,16 +38,16 @@ func DescribeInstancesAWS() bool {
 			}
 		}
 		fmt.Printf("Total of %v instances \n", counter)
-		mapping := MapInstanceStates(reservations)
+		mapping := MapInstanceStates2(reservations)
 		fmt.Println(mapping)
-		flatInstances := FlatReservations(reservations)
+		flatInstances := FlatReservations2(reservations)
 		fmt.Println("Len of flat instances: ", len(flatInstances))
 
 	}
 	return true
 }
 
-func MapInstanceStates(reservations []*ec2.Reservation) map[string]int {
+func MapInstanceStates2(reservations []*ec2.Reservation) map[string]int {
 	m := make(map[string]int)
 	for _, r := range reservations {
 		for _, instance := range r.Instances {
@@ -55,7 +58,7 @@ func MapInstanceStates(reservations []*ec2.Reservation) map[string]int {
 	return m
 }
 
-func FlatReservations(reservations []*ec2.Reservation) []*ec2.Instance {
+func FlatReservations2(reservations []*ec2.Reservation) []*ec2.Instance {
 	instances := []*ec2.Instance{}
 	for _, r := range reservations {
 		for _, i := range r.Instances {

@@ -1,17 +1,17 @@
-package aws_resource_explorer
+package aws_services
 
 import "testing"
 
 func TestHello(t *testing.T) {
 	want := "Hello, world."
-	if got := Hello(); got != want {
+	if got := Hello2(); got != want {
 		t.Errorf("Hello() = %q, want %q", got, want)
 	}
 }
 
 func TestDescribeInstancesAWS(t *testing.T) {
 	want := true
-	if success := DescribeInstancesAWS(); success != want {
+	if success := DescribeInstancesAWS2(); success != want {
 		t.Errorf("DescribeInstancesAWS() = %t, want %t", success, want)
 	}
 }
