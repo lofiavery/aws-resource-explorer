@@ -2,6 +2,7 @@ package aws_services
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	ec2 "github.com/aws/aws-sdk-go/service/ec2"
 )
@@ -66,4 +67,28 @@ func FlatReservations2(reservations []*ec2.Reservation) []*ec2.Instance {
 		}
 	}
 	return instances
+}
+
+// Get all ec2 instances running in the account
+func GetInstances(sess *session.Session) ([]*ec2.Instance, error) {
+	eastInstances, err1 := GetInstancesRegion(sess, "us-east-1")
+	if err1 != nil {
+		return nil, err1
+	}
+	westInstances, err2 := GetInstancesRegion(sess, "us-west-2")
+	if err2 != nil {
+		return nil, err2
+	}
+	return append(eastInstances, westInstances...), nil
+}
+
+func GetInstancesRegion(sess *session.Session, region string) ([]*ec2.Instance, error) {
+	sess.Config.Region = aws.String(region)
+	ec2Svc := ec2.New(sess)
+	result, err := ec2Svc.DescribeInstances(nil)
+	if err != nil {
+		return nil, err
+	}
+	instances := FlatReservations2(result.Reservations)
+	return instances, nil
 }
