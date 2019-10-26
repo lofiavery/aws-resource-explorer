@@ -8,15 +8,28 @@ import (
 
 func main() {
 	sess := utils.GetEnvSession()
+	// var conf = make(map[string]interface{})
+	// regions := []string{"us-east-1", "us-west-2"}
+	// conf["regions"] = regions
+	// ec2Handler := s.EC2InstanceHandler{}
+	// ec2Handler.Fetch(conf, sess, func(e error, r s.Resource) {
+	// 	if e != nil {
+	// 		panic(e)
+	// 	}
+	// 	ec2Instances := r.(*s.EC2InstancesResource)
+	// 	fmt.Println(ec2Instances.Instances)
+	// })
+
+	// enis
 	var conf = make(map[string]interface{})
 	regions := []string{"us-east-1", "us-west-2"}
 	conf["regions"] = regions
-	ec2Handler := s.EC2Handler{}
-	ec2Handler.Fetch(conf, sess, func(e error, r s.Resource) {
+	eniHandler := s.EC2EniHander{}
+	eniHandler.Fetch(conf, sess, func(e error, r s.Resource) {
 		if e != nil {
 			panic(e)
 		}
-		ec2Instances := r.(*s.EC2Instances)
-		fmt.Println(len(ec2Instances.Instances))
+		enis := r.(*s.EC2EniResource)
+		fmt.Println(len(enis.Interfaces))
 	})
 }
