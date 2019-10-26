@@ -51,28 +51,85 @@ func GetInstancesRegion(sess *session.Session, region string) ([]*ec2.Instance, 
 	instances := FlatReservations2(result.Reservations)
 	return instances, nil
 }
+func GetEniRegion(sess *session.Session, region string) ([]*ec2.NetworkInterface, error) {
+	sess.Config.Region = aws.String(region)
+	ec2Svc := ec2.New(sess)
+	result, err := ec2Svc.DescribeNetworkInterfaces(nil)
+	if err != nil {
+		return nil, err
+	}
+	return result.NetworkInterfaces, nil
+}
 
-type EC2Instances struct {
-	id        string
+/*
+	Network Interfaces (eni)
+*/
+type EC2EniResource struct {
+	Interfaces []*ec2.NetworkInterface
+}
+
+func (i EC2EniResource) Id() string {
+	return "ec2-network-interfaces"
+}
+
+type EC2EniHander struct {
+	Eni *EC2EniResource
+}
+
+func (h EC2EniHander) Id() string {
+	return "ec2-network-interfaces"
+}
+func (h *EC2EniHander) Get() Resource {
+	return h.Eni
+}
+func (h *EC2EniHander) Fetch(config Conf, sess *session.Session, callback ResCb) {
+	regions := []string{}
+	if config["regions"] != nil {
+		regions = config["regions"].([]string)
+	} else {
+		regions = []string{*sess.Config.Region}
+	}
+	var wg sync.WaitGroup
+	wg.Add(len(regions))
+	allEnis := []*ec2.NetworkInterface{}
+	for _, r := range regions {
+		go func(r string) {
+			defer wg.Done()
+			enis, err := GetEniRegion(sess, r)
+			if err == nil {
+				allEnis = append(allEnis, enis...)
+			}
+		}(r)
+	}
+	wg.Wait()
+	resource := &EC2EniResource{Interfaces: allEnis}
+	h.Eni = resource
+	callback(nil, resource)
+}
+
+/*
+	Instances
+*/
+
+type EC2InstancesResource struct {
 	Instances []*ec2.Instance
 }
 
-func (i EC2Instances) Id() string {
+func (i EC2InstancesResource) Id() string {
 	return "ec2-instances"
 }
 
-type EC2Handler struct {
-	id        string
-	instances *EC2Instances
+type EC2InstanceHandler struct {
+	instances *EC2InstancesResource
 }
 
-func (h EC2Handler) Id() string {
-	return "ec2"
+func (h EC2InstanceHandler) Id() string {
+	return "ec2-instances"
 }
-func (h *EC2Handler) Get() Resource {
+func (h *EC2InstanceHandler) Get() Resource {
 	return h.instances
 }
-func (h *EC2Handler) Fetch(config Conf, sess *session.Session, callback ResCb) {
+func (h *EC2InstanceHandler) Fetch(config Conf, sess *session.Session, callback ResCb) {
 	regions := []string{}
 	if config["regions"] != nil {
 		regions = config["regions"].([]string)
@@ -92,7 +149,7 @@ func (h *EC2Handler) Fetch(config Conf, sess *session.Session, callback ResCb) {
 		}(r)
 	}
 	wg.Wait()
-	resource := &EC2Instances{Instances: allInstances}
+	resource := &EC2InstancesResource{Instances: allInstances}
 	h.instances = resource
 	callback(nil, resource)
 }
