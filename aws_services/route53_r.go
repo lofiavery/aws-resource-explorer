@@ -115,6 +115,6 @@ func (h *R53ZonesHandler) Fetch(config Conf, sess *session.Session, callback Res
 	} else {
 		resource := &R53ZonesResource{Zones: zones}
 		h.ZonesResource = resource
-		callback(nil, resource)
+		callback(nil, h.ZonesResource)
 	}
 }
