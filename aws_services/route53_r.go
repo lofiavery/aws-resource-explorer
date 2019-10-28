@@ -8,6 +8,8 @@ import (
 	route53 "github.com/aws/aws-sdk-go/service/route53"
 )
 
+type ZoneID string
+
 func GetZones(sess *session.Session) ([]*route53.HostedZone, error) {
 	r53 := route53.New(sess)
 	r, err := r53.ListHostedZones(nil)
@@ -117,4 +119,29 @@ func (h *R53ZonesHandler) Fetch(config Conf, sess *session.Session, callback Res
 		h.ZonesResource = resource
 		callback(nil, h.ZonesResource)
 	}
+}
+
+/** Route53 Zones and RecordSet*/
+
+type R53ZonesWithRecordsResource struct {
+	Zones      []*route53.HostedZone
+	RecordsMap map[ZoneID][]*route53.ResourceRecordSet
+}
+
+func (i R53ZonesWithRecordsResource) Id() string {
+	return "r53-zones-and-records-set"
+}
+
+type R53ZonesWithRecordsHandler struct {
+	R53ZonesWithRecordsResource *R53ZonesWithRecordsResource
+}
+
+func (i R53ZonesWithRecordsHandler) Id() string {
+	return "r53-zones-and-records-set"
+}
+func (h *R53ZonesWithRecordsHandler) Get() Resource {
+	return h.R53ZonesWithRecordsResource
+}
+func (h *R53ZonesWithRecordsHandler) Fetch(config Conf, sess *session.Session, callback ResCb) {
+
 }
