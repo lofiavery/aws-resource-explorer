@@ -1,6 +1,7 @@
 package aws_services
 
 import (
+	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -49,6 +50,42 @@ func GetRecordSetsNoPage(sess *session.Session, zoneID string) ([]*route53.Resou
 		}
 	}
 	return result, nil
+}
+
+/* Route53 recods */
+type R53RecordSetsResource struct {
+	Records []*route53.ResourceRecordSet
+}
+
+func (i R53RecordSetsResource) Id() string {
+	return "r53-records-set"
+}
+
+type R53RecordSetsHandler struct {
+	RecordsResource *R53RecordSetsResource
+}
+
+func (h R53RecordSetsHandler) Id() string {
+	return "r53-records-set"
+}
+func (h *R53RecordSetsHandler) Get() Resource {
+	return h.RecordsResource
+}
+func (h *R53RecordSetsHandler) Fetch(config Conf, sess *session.Session, callback ResCb) {
+	zoneId := config["zone-id"]
+	if zoneId == nil {
+		err := errors.New("missing zone-id")
+		callback(err, nil)
+	} else {
+		response, err := GetRecordSetsNoPage(sess, zoneId.(string))
+		if err != nil {
+			callback(err, nil)
+		} else {
+			resource := &R53RecordSetsResource{Records: response}
+			h.RecordsResource = resource
+			callback(nil, resource)
+		}
+	}
 }
 
 /* Route53 zones */
