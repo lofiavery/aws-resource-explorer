@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	fmt.Println("...")
 	sess := utils.GetEnvSession()
 	// var conf = make(map[string]interface{})
 	// regions := []string{"us-east-1", "us-west-2"}
@@ -21,15 +22,19 @@ func main() {
 	// })
 
 	// enis
-	var conf = make(map[string]interface{})
-	regions := []string{"us-east-1", "us-west-2"}
-	conf["regions"] = regions
-	eniHandler := s.EC2EniHander{}
-	eniHandler.Fetch(conf, sess, func(e error, r s.Resource) {
-		if e != nil {
-			panic(e)
-		}
-		enis := r.(*s.EC2EniResource)
-		fmt.Println(len(enis.Interfaces))
-	})
+	// var conf = make(map[string]interface{})
+	// regions := []string{"us-east-1", "us-west-2"}
+	// conf["regions"] = regions
+	// eniHandler := s.EC2EniHander{}
+	// eniHandler.Fetch(conf, sess, func(e error, r s.Resource) {
+	// 	if e != nil {
+	// 		panic(e)
+	// 	}
+	// 	enis := r.(*s.EC2EniResource)
+	// 	fmt.Println(len(enis.Interfaces))
+	// })
+
+	// route53
+	res, _ := s.GetRecordSetsNoPage(sess, "/hostedzone/Z1AEL1R23MWQEZ")
+	fmt.Println(len(res))
 }
