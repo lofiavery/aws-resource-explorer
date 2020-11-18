@@ -10,10 +10,4 @@ func TestHostedZones(t *testing.T) {
 	GetZones(sess)
 }
 
-func TestRecordSetsNoPage(t *testing.T) {
-	sess := utils.GetEnvSession()
-	res, _ := GetRecordSetsNoPage(sess, "/hostedzone/Z1AEL1R23MWQEZ")
-	if len(res) < 250 {
-		t.Errorf("TestEc2InstancesResource(): %d < 250", len(res))
-	}
-}
+
